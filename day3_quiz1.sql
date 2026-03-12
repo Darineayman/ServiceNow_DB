@@ -1,217 +1,242 @@
-CREATE TABLE doctors (
+CREATE TABLE Doctor (
     doctor_id INT PRIMARY KEY,
-    first_name VARCHAR(50),
-    middle_name VARCHAR(50),
-    last_name VARCHAR(50),
-    specialization VARCHAR(100),
-    qualification VARCHAR(100)
+    specialization VARCHAR(50),
+    qualification VARCHAR(50),
+    name_first VARCHAR(50),
+    name_middle VARCHAR(50),
+    name_last VARCHAR(50)
 );
-
-
-CREATE TABLE patients (
+CREATE TABLE Patient (
     patient_id INT PRIMARY KEY,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
     dob DATE,
-    locality VARCHAR(100),
-    city VARCHAR(100),
-    doctor_id INT
+    address_locality VARCHAR(50),
+    address_city VARCHAR(50)
 );
-
-
-
-ALTER TABLE patients
-ADD CONSTRAINT fk_patients_doctor
-FOREIGN KEY (doctor_id)
-REFERENCES doctors(doctor_id)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
-
-
-CREATE TABLE medicines (
-    code INT PRIMARY KEY,
-    medicine_name VARCHAR(100),
+CREATE TABLE Medicine (
+    code VARCHAR(10) PRIMARY KEY,
     price NUMERIC(10,2),
     quantity INT
 );
-
-
-
-CREATE TABLE patient_medicine (
-    bill_id INT PRIMARY KEY,
+CREATE TABLE Doctor_Treats_Patient (
+    doctor_id INT,
     patient_id INT,
-    medicine_code INT,
+    PRIMARY KEY (doctor_id, patient_id),
+    FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id),
+    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id)
+);
+CREATE TABLE Patient_Bills_Medicine (
+    patient_id INT,
+    medicine_code VARCHAR(10),
     quantity INT,
-    bill_date DATE
+    PRIMARY KEY (patient_id, medicine_code),
+    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id),
+    FOREIGN KEY (medicine_code) REFERENCES Medicine(code)
 );
 
-
-ALTER TABLE patient_medicine
-ADD CONSTRAINT fk_pm_patient
-FOREIGN KEY (patient_id)
-REFERENCES patients(patient_id)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
-
-ALTER TABLE patient_medicine
-ADD CONSTRAINT fk_pm_medicine
-FOREIGN KEY (medicine_code)
-REFERENCES medicines(code)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
-
-
-
-INSERT INTO doctors (doctor_id, first_name, middle_name, last_name, specialization, qualification)
-VALUES
-(1, 'Ahmed', 'Ali', 'Hassan', 'Cardiology', 'MBBS'),
-(2, 'Mona', 'Ibrahim', 'Khaled', 'Dermatology', 'MD'),
-(3, 'Youssef', 'Samir', 'Adel', 'Neurology', 'PhD');
-
-
-
-INSERT INTO patients (patient_id, first_name, last_name, dob, locality, city, doctor_id)
-VALUES
-(101, 'Sara', 'Mahmoud', '2000-05-10', 'Nasr City', 'Cairo', 1),
-(102, 'Omar', 'Fathy', '1998-08-15', 'Smouha', 'Alexandria', 2),
-(103, 'Laila', 'Tarek', '2002-01-20', 'Dokki', 'Giza', 1),
-(104, 'Karim', 'Nabil', '1995-11-03', 'Stanley', 'Alexandria', 3),
-(105, 'Nour', 'Ayman', '2001-07-25', 'Maadi', 'Cairo', 2);
-
-
-
-INSERT INTO medicines (code, medicine_name, price, quantity)
-VALUES
-(1001, 'Panadol', 30.00, 100),
-(1002, 'Amoxicillin', 55.50, 60),
-(1003, 'Brufen', 42.75, 80),
-(1004, 'Vitamin C', 25.00, 120),
-(1005, 'Insulin', 150.00, 40);
-
-
-INSERT INTO patient_medicine (bill_id, patient_id, medicine_code, quantity, bill_date)
-VALUES
-(1, 101, 1001, 2, '2026-03-01'),
-(2, 102, 1002, 1, '2026-03-02'),
-(3, 103, 1003, 3, '2026-03-03'),
-(4, 104, 1005, 1, '2026-03-04'),
-(5, 105, 1004, 2, '2026-03-05');
-
-
-
-UPDATE medicines
-SET price = price + 10
-WHERE code = 1001;
-
-
-UPDATE patients
-SET doctor_id = 3
-WHERE patient_id = 105;
-
-
-ALTER TABLE doctors
-ADD COLUMN phone_number VARCHAR(20);
-
-
-ALTER TABLE patients
-ADD COLUMN email VARCHAR(100) UNIQUE;
-
-
-
-UPDATE patients SET email = 'sara@example.com' WHERE patient_id = 101;
-UPDATE patients SET email = 'omar@example.com' WHERE patient_id = 102;
-UPDATE patients SET email = 'laila@example.com' WHERE patient_id = 103;
-UPDATE patients SET email = 'karim@example.com' WHERE patient_id = 104;
-UPDATE patients SET email = 'nour@example.com' WHERE patient_id = 105;
-
-
-ALTER TABLE medicines
-ADD CONSTRAINT chk_medicines_price
-CHECK (price >= 0);
-
-
-
-UPDATE doctors
-SET doctor_id = 10
-WHERE doctor_id = 1;
-
-SELECT * FROM doctors;
-SELECT * FROM patients;
-SELECT * FROM medicines;
-SELECT * FROM patient_medicine;
-
-
-DROP TABLE diseases CASCADE
-DROP TABLE patient_disease CASCADE
-
-ALTER TABLE patients
-DROP COLUMN doctor_id;
-
-
---1
-DELETE FROM patients
-WHERE patient_id = 5;
-
-
-
--- add salary column
-ALTER TABLE doctors
+ALTER TABLE Doctor
 ADD COLUMN salary NUMERIC(10,2);
 
-UPDATE doctors
-SET salary = 15000
-WHERE doctor_id = 1;
+ALTER TABLE Patient
+ADD COLUMN name VARCHAR(100),
+ADD COLUMN phone VARCHAR(20);
 
-UPDATE doctors
-SET salary = 18000
-WHERE doctor_id = 2;
 
-UPDATE doctors
-SET salary = 12000
-WHERE doctor_id = 3;
+INSERT INTO Doctor (Doctor_id, Specialization, Qualification, Name_First, Name_Middle, Name_Last) 
+VALUES 
+(1, 'Cardiology', 'MD', 'Ahmed', 'Ali', 'Hassan'), 
+(2, 'Neurology', 'PhD', 'Mona', 'Mohamed', 'Fahmy'), 
+(3, 'Orthopedics', 'MBBS', 'Khaled', NULL, 'Saeed'), 
+(4, 'Pediatrics', 'MD', 'Sara', 'Ahmed', 'Nabil'), 
+(5, 'Dermatology', 'MD', 'Omar', 'Hassan', 'Farouk');
 
+INSERT INTO Patient (Patient_id, DOB, Address_Locality, Address_City) 
+VALUES 
+(101, '1990-05-12', 'Heliopolis', 'Cairo'), 
+(102, '1985-11-23', 'Zamalek', 'Cairo'), 
+(103, '2000-01-30', 'Nasr City', 'Cairo'), 
+(104, '2010-07-15', 'Maadi', 'Cairo'), 
+(105, '1975-09-10', 'Dokki', 'Giza');
+
+INSERT INTO Medicine (Code, Price, Quantity) 
+VALUES 
+('M001', 150.50, 20), 
+('M002', 75.00, 50), 
+('M003', 300.25, 10), 
+('M004', 120.00, 30), 
+('M005', 50.75, 100);
+
+INSERT INTO Doctor_Treats_Patient (Doctor_id, Patient_id) 
+VALUES 
+(1, 101), 
+(1, 102), 
+(2, 103), 
+(3, 104), 
+(4, 105), 
+(2, 101);
+
+INSERT INTO Patient_Bills_Medicine (Patient_id, Medicine_Code, Quantity) 
+VALUES 
+(101, 'M001', 2), 
+(101, 'M002', 1), 
+(102, 'M003', 1), 
+(103, 'M002', 3), 
+(104, 'M004', 2), 
+(105, 'M005', 5);
+
+
+UPDATE Doctor SET salary = 18000 WHERE doctor_id = 1;
+UPDATE Doctor SET salary = 14000 WHERE doctor_id = 2;
+UPDATE Doctor SET salary = 11000 WHERE doctor_id = 3;
+UPDATE Doctor SET salary = 16000 WHERE doctor_id = 4;
+UPDATE Doctor SET salary = 13000 WHERE doctor_id = 5;
+
+--1
+DELETE FROM Patient
+WHERE patient_id = 5;
+
+SELECT * FROM Patient
 
 -- 2
 SELECT *
-FROM doctors
+FROM Doctor
 WHERE specialization = 'Cardiology'
   AND salary > 12000;
+-------------------------------------------------------------------------
 
+UPDATE Patient
+SET 
+    name = CASE patient_id
+        WHEN 101 THEN 'Mohamed Adel'
+        WHEN 102 THEN 'Mariam Hany'
+        WHEN 103 THEN 'Ali Samy'
+        WHEN 104 THEN 'Ahmed Tarek'
+        WHEN 105 THEN 'Nora Emad'
+    END,
+    
+    phone = CASE patient_id
+        WHEN 101 THEN '01011111111'
+        WHEN 102 THEN '01022222222'
+        WHEN 103 THEN '01033333333'
+        WHEN 104 THEN '01044444444'
+        WHEN 105 THEN NULL
+    END
+WHERE patient_id IN (101,102,103,104,105);
+------------------------------------------------------------------------------
 -- 3
 SELECT *
-FROM patients
-WHERE first_name LIKE 'M%';
+FROM Patient
+WHERE name LIKE 'M%';
 
 --4
 SELECT *
-FROM doctors
+FROM doctor
 WHERE salary BETWEEN 10000 AND 20000;
 
 --5
 SELECT *
-FROM doctors
+FROM doctor
 WHERE specialization IN ('Cardiology', 'Dermatology');
 
 --6
 SELECT *
-FROM doctors
+FROM doctor
 WHERE specialization != 'Neurology';
-
-
---add phone_number column
-ALTER TABLE patients
-ADD COLUMN phone_number VARCHAR(20);
-
-UPDATE patients
-SET phone_number = '01012345678'
-WHERE patient_id = 101;
-
-UPDATE patients
-SET phone_number = '01198765432'
-WHERE patient_id = 102;
 
 
 --7
 SELECT *
-FROM patients
-WHERE phone_number IS NULL;
+FROM patient
+WHERE phone IS NULL;
+
+--8
+SELECT
+    name_first,
+    name_last,
+    salary,
+    CASE
+        WHEN salary > 15000 THEN 'High Salary'
+        ELSE 'Normal Salary'
+    END AS salary_status
+FROM doctor;
+
+
+--9
+SELECT p.*
+FROM Patient p, Doctor_Treats_Patient d
+WHERE p.patient_id = d.patient_id
+AND d.doctor_id = 1;
+
+
+--10
+CREATE TABLE high_salary_doctors AS
+SELECT *
+FROM Doctor
+WHERE salary > 15000;
+
+--11
+SELECT DISTINCT d.*
+FROM Doctor d, Doctor_Treats_Patient dtp
+WHERE d.doctor_id = dtp.doctor_id;
+
+--12
+SELECT *
+FROM Doctor
+WHERE salary > (
+    SELECT MIN(salary)
+    FROM Doctor
+    WHERE specialization = 'Cardiology'
+);
+
+-- 13
+SELECT *
+FROM Patient
+WHERE name SIMILAR TO '(A|M)%';
+
+-- 14
+SELECT DISTINCT specialization
+FROM Doctor;
+
+-- 15
+SELECT name,
+EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM dob)
+FROM patient;
+
+--16
+SELECT name,
+       UPPER(name) AS upper_name,
+       LOWER(name) AS lower_name,
+       INITCAP(name) AS capitalized_name
+FROM Patient;
+
+
+--17
+SELECT phone,
+       TRIM(phone) AS clean_phone
+FROM Patient;
+
+--18
+SELECT CONCAT(name, ' - ', phone) AS contact_info
+FROM patient;
+
+--19
+SELECT name,
+       SUBSTRING(name FROM 1 FOR 3) AS first_3_letters,
+       POSITION('a' IN LOWER(name)) AS position_of_a
+FROM Patient;
+
+--20
+SELECT name_first,
+       REPLACE(name_first, 'Ahmed', 'Ahmad') AS updated_name
+FROM Doctor;
+
+--21
+SELECT salary,
+       CAST(salary AS INTEGER) AS salary_as_integer,
+       CAST(salary AS TEXT) AS salary_as_text
+FROM Doctor;
+
+
+
+
+
+
